@@ -1,7 +1,9 @@
 package ru.avalon.java.j30.labs;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
@@ -20,18 +22,15 @@ public class Main {
      * Точка входа в приложение
      * 
      * @param args the command line arguments
+     * @throws java.sql.SQLException
      */
     public static void main(String[] args) throws SQLException {
-        /*
-         * TODO #01 Подключите к проекту все библиотеки, необходимые для соединения с СУБД.
-         */
-        try (Connection connection = getConnection()) {
-            ProductCode code = new ProductCode("MO", 'N', "Movies");
-            code.save(connection);
-            printAllCodes(connection);
 
-            code.setCode("MV");
-            code.save(connection);
+        try (Connection connection = getConnection()) {
+            
+            ArrayList<ProductCode> a = (ArrayList<ProductCode>) ProductCode.all(connection);
+            a.get(0).setDescription("tttttt");
+            a.get(0).save(connection);
             printAllCodes(connection);
         }
         /*
@@ -56,10 +55,8 @@ public class Main {
      * @return URL в виде объекта класса {@link String}
      */
     private static String getUrl() {
-        /*
-         * TODO #02 Реализуйте метод getUrl
-         */
-        throw new UnsupportedOperationException("Not implemented yet!");
+        return "jdbc:derby://localhost:1527/sample";
+        
     }
     /**
      * Возвращает параметры соединения
@@ -68,10 +65,13 @@ public class Main {
      * password
      */
     private static Properties getProperties() {
-        /*
-         * TODO #03 Реализуйте метод getProperties
-         */
-        throw new UnsupportedOperationException("Not implemented yet!");
+        Properties properties = new Properties();;
+        properties.setProperty("user", "app");
+        properties.setProperty("password", "app");
+
+        
+        
+        return properties;
     }
     /**
      * Возвращает соединение с базой данных Sample
@@ -79,11 +79,9 @@ public class Main {
      * @return объект типа {@link Connection}
      * @throws SQLException 
      */
-    private static Connection getConnection() throws SQLException {
-        /*
-         * TODO #04 Реализуйте метод getConnection
-         */
-        throw new UnsupportedOperationException("Not implemented yet!");
+    private static Connection getConnection() throws SQLException {        
+        Connection connection = DriverManager.getConnection(getUrl(), getProperties());
+        return connection;
     }
     
 }
