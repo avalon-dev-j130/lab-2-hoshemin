@@ -1,5 +1,7 @@
 package ru.avalon.java.j30.labs;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -25,17 +27,14 @@ public class Main {
      * @throws java.sql.SQLException
      */
     public static void main(String[] args) throws SQLException {
-
+        
         try (Connection connection = getConnection()) {
-            
             ArrayList<ProductCode> a = (ArrayList<ProductCode>) ProductCode.all(connection);
             a.get(0).setDescription("tttttt");
             a.get(0).save(connection);
             printAllCodes(connection);
         }
-        /*
-         * TODO #14 Средствами отладчика проверьте корректность работы программы
-         */
+        
     }
     /**
      * Выводит в кодсоль все коды товаров
@@ -55,8 +54,8 @@ public class Main {
      * @return URL в виде объекта класса {@link String}
      */
     private static String getUrl() {
-        return "jdbc:derby://localhost:1527/sample";
         
+        return getProperties().getProperty("url");
     }
     /**
      * Возвращает параметры соединения
@@ -65,13 +64,14 @@ public class Main {
      * password
      */
     private static Properties getProperties() {
-        Properties properties = new Properties();;
-        properties.setProperty("user", "app");
-        properties.setProperty("password", "app");
-
         
-        
-        return properties;
+        Properties pr = new Properties();
+        try (InputStream is = ClassLoader.getSystemResourceAsStream("application.properties")) {
+            pr.load(is);
+        } catch (IOException e){
+            System.err.println("Файл не найден!");
+          }
+        return pr;
     }
     /**
      * Возвращает соединение с базой данных Sample
@@ -79,9 +79,9 @@ public class Main {
      * @return объект типа {@link Connection}
      * @throws SQLException 
      */
-    private static Connection getConnection() throws SQLException {        
-        Connection connection = DriverManager.getConnection(getUrl(), getProperties());
-        return connection;
+    private static Connection getConnection() throws SQLException {
+        
+        return DriverManager.getConnection(getUrl(), getProperties());
     }
     
 }
